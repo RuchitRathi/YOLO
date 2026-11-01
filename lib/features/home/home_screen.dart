@@ -10,6 +10,7 @@ import '../../data/repository.dart';
 import '../../shared/widgets/animated_entrance.dart';
 import '../../shared/widgets/comic_components.dart';
 import '../../shared/widgets/mission_details_sheet.dart';
+import '../../shared/widgets/interactive_tilt.dart';
 import '../../shared/widgets/yolo_scaffold.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -429,107 +430,112 @@ class _AdventureHero extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => Material(
-        color: YoloColors.ink,
-        borderRadius: BorderRadius.circular(28),
-        child: InkWell(
-          onTap: onTap,
+  Widget build(BuildContext context) => InteractiveTilt(
+        maxTilt: .065,
+        hoverScale: 1.012,
+        child: Material(
+          color: YoloColors.ink,
           borderRadius: BorderRadius.circular(28),
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 190),
-            padding: const EdgeInsets.all(22),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(color: YoloColors.ink, width: 2),
-              boxShadow: const [
-                BoxShadow(
-                    color: Color(0x33202020),
-                    offset: Offset(0, 7),
-                    blurRadius: 0)
-              ],
-            ),
-            child: LayoutBuilder(builder: (context, constraints) {
-              final narrow = constraints.maxWidth < 450;
-              final mascotWidth = narrow
-                  ? (constraints.maxWidth * .28).clamp(78.0, 96.0)
-                  : 116.0;
-              final mascot = _ShinchanMascot(
-                width: mascotWidth,
-                height: mascotWidth * 1.46,
-              );
-              final intro = Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                        color: YoloColors.yellow,
-                        borderRadius: BorderRadius.circular(20)),
-                    child: const Text('TODAY IS YOURS',
-                        style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.2)),
-                  ),
-                  const SizedBox(height: 13),
-                  Text('Make a little\nchaos.',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: narrow ? 27 : 34,
-                          height: 1.02,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: -1.4)),
-                  const SizedBox(height: 9),
-                  const Text('One small adventure can change the whole vibe.',
-                      style: TextStyle(color: Color(0xFFD9D7D0), fontSize: 12)),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(28),
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 190),
+              padding: const EdgeInsets.all(22),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: YoloColors.ink, width: 2),
+                boxShadow: const [
+                  BoxShadow(
+                      color: Color(0x33202020),
+                      offset: Offset(0, 7),
+                      blurRadius: 0)
                 ],
-              );
-              final action = Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                    color: YoloColors.red,
-                    borderRadius: BorderRadius.circular(14)),
-                child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text('FIND MY ADVENTURE',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 10,
-                          letterSpacing: .7)),
-                  SizedBox(width: 8),
-                  Icon(Icons.arrow_forward_rounded,
-                      color: Colors.white, size: 16),
-                ]),
-              );
-
-              if (narrow) {
-                return Column(
+              ),
+              child: LayoutBuilder(builder: (context, constraints) {
+                final narrow = constraints.maxWidth < 450;
+                final mascotWidth = narrow
+                    ? (constraints.maxWidth * .28).clamp(78.0, 96.0)
+                    : 116.0;
+                final mascot = _ShinchanMascot(
+                  width: mascotWidth,
+                  height: mascotWidth * 1.46,
+                );
+                final intro = Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(children: [
-                      Expanded(child: intro),
-                      const SizedBox(width: 8),
-                      mascot,
-                    ]),
-                    const SizedBox(height: 16),
-                    action,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                          color: YoloColors.yellow,
+                          borderRadius: BorderRadius.circular(20)),
+                      child: const Text('TODAY IS YOURS',
+                          style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.2)),
+                    ),
+                    const SizedBox(height: 13),
+                    Text('Make a little\nchaos.',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: narrow ? 27 : 34,
+                            height: 1.02,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -1.4)),
+                    const SizedBox(height: 9),
+                    const Text('One small adventure can change the whole vibe.',
+                        style:
+                            TextStyle(color: Color(0xFFD9D7D0), fontSize: 12)),
                   ],
                 );
-              }
-              return Row(children: [
-                Expanded(
-                  child: Column(
+                final action = Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                      color: YoloColors.red,
+                      borderRadius: BorderRadius.circular(14)),
+                  child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text('FIND MY ADVENTURE',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 10,
+                            letterSpacing: .7)),
+                    SizedBox(width: 8),
+                    Icon(Icons.arrow_forward_rounded,
+                        color: Colors.white, size: 16),
+                  ]),
+                );
+
+                if (narrow) {
+                  return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [intro, const SizedBox(height: 16), action],
+                    children: [
+                      Row(children: [
+                        Expanded(child: intro),
+                        const SizedBox(width: 8),
+                        mascot,
+                      ]),
+                      const SizedBox(height: 16),
+                      action,
+                    ],
+                  );
+                }
+                return Row(children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [intro, const SizedBox(height: 16), action],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                mascot,
-              ]);
-            }),
+                  const SizedBox(width: 8),
+                  mascot,
+                ]);
+              }),
+            ),
           ),
         ),
       );
@@ -598,15 +604,36 @@ class _ShinchanMascotState extends State<_ShinchanMascot>
                 final angle = disabled
                     ? 0.0
                     : wiggle * .18 + math.sin(idle * math.pi * 2) * .025;
+                final pose = !disabled && dance < .38
+                    ? 'assets/images/shinchan_cheer.png'
+                    : !disabled && dance < .78
+                        ? 'assets/images/shinchan_flowers.png'
+                        : 'assets/images/shinchan.png';
                 return Transform.translate(
                   offset: offset,
                   child: Transform.rotate(
                     angle: angle,
-                    child: Image.asset(
-                      'assets/images/shinchan.png',
-                      fit: BoxFit.contain,
-                      filterQuality: FilterQuality.high,
-                      excludeFromSemantics: true,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 180),
+                      switchInCurve: Curves.easeOutBack,
+                      switchOutCurve: Curves.easeIn,
+                      transitionBuilder: (child, animation) => FadeTransition(
+                        opacity: animation,
+                        child: ScaleTransition(
+                          scale: Tween<double>(begin: .75, end: 1).animate(
+                              CurvedAnimation(
+                                  parent: animation,
+                                  curve: Curves.easeOutBack)),
+                          child: child,
+                        ),
+                      ),
+                      child: Image.asset(
+                        pose,
+                        key: ValueKey(pose),
+                        fit: BoxFit.contain,
+                        filterQuality: FilterQuality.high,
+                        excludeFromSemantics: true,
+                      ),
                     ),
                   ),
                 );
