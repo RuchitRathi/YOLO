@@ -172,9 +172,7 @@ class HomeScreen extends ConsumerWidget {
                         icon: Icons.groups_rounded,
                         label: 'Squad YOLO',
                         onTap: () => context.push('/squad')),
-                    _WorldChip(
-                        icon: Icons.smart_toy_rounded,
-                        label: 'Ask Shinchan',
+                    _ShinchanChatButton(
                         onTap: () => context.push('/companion')),
                     _WorldChip(
                         icon: Icons.photo_album_outlined,
@@ -722,5 +720,78 @@ class _WorldChip extends StatelessWidget {
         backgroundColor: Colors.white,
         side: const BorderSide(color: Color(0x22202020)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      );
+}
+
+class _ShinchanChatButton extends StatelessWidget {
+  const _ShinchanChatButton({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: 'Ask Shinchan, open the AI companion chat',
+        child: InteractiveTilt(
+          maxTilt: .08,
+          hoverScale: 1.04,
+          child: Material(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(18),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(7, 5, 12, 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: YoloColors.ink, width: 1.5),
+                  boxShadow: const [
+                    BoxShadow(color: Color(0x25202020), offset: Offset(2, 3)),
+                  ],
+                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Container(
+                    width: 35,
+                    height: 35,
+                    decoration: BoxDecoration(
+                      color: YoloColors.yellow,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: YoloColors.ink, width: 1),
+                    ),
+                    child: ClipOval(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Image.asset(
+                          'assets/images/shinchan.png',
+                          fit: BoxFit.contain,
+                          excludeFromSemantics: true,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Ask Shinchan',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w900, fontSize: 12)),
+                      Text('YOUR AI BUDDY',
+                          style: TextStyle(
+                              color: YoloColors.red,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 8,
+                              letterSpacing: .6)),
+                    ],
+                  ),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.chat_bubble_rounded,
+                      color: YoloColors.red, size: 16),
+                ]),
+              ),
+            ),
+          ),
+        ),
       );
 }
