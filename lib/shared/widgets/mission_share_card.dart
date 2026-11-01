@@ -9,6 +9,8 @@ import 'package:screenshot/screenshot.dart';
 import '../../app/providers.dart';
 import '../../app/theme.dart';
 import '../../data/repository.dart';
+import 'mission_camera_sheet.dart';
+import 'mission_proof_filter.dart';
 
 Future<void> showMissionShareCard(
         BuildContext context, WidgetRef ref, Mission mission,
@@ -44,17 +46,38 @@ class _ShareCardSheet extends StatefulWidget {
 
 class _ShareCardSheetState extends State<_ShareCardSheet> {
   final _controller = ScreenshotController();
+  final _picker = ImagePicker();
   Uint8List? _photo;
   bool _sharing = false;
+  MissionProofFilter _filter = MissionProofFilter.comic;
+  MissionProofSticker _sticker = MissionProofSticker.none;
+  Alignment _stickerAlignment = const Alignment(.72, .48);
 
-  Future<void> _pickPhoto() async {
+  Future<void> _openCamera() async {
+    final capture = await showMissionCamera(context);
+    if (capture != null && mounted) {
+      setState(() {
+        _photo = capture.bytes;
+        _filter = capture.filter;
+        _sticker = capture.sticker;
+        _stickerAlignment = capture.stickerAlignment;
+      });
+    }
+  }
+
+  Future<void> _pickPhoto(ImageSource source) async {
     try {
-      final image = await ImagePicker().pickImage(
-          source: ImageSource.gallery, imageQuality: 88, maxWidth: 1400);
-      if (image != null) setState(() => _photo = null);
+      final image = await _picker.pickImage(
+          source: source, imageQuality: 90, maxWidth: 1600);
       if (image != null) {
         final bytes = await image.readAsBytes();
-        if (mounted) setState(() => _photo = bytes);
+        if (mounted) {
+          setState(() {
+            _photo = bytes;
+            _filter = MissionProofFilter.comic;
+            _sticker = MissionProofSticker.none;
+          });
+        }
       }
     } catch (_) {
       if (mounted) {
@@ -97,15 +120,50 @@ class _ShareCardSheetState extends State<_ShareCardSheet> {
                     style: TextStyle(
                         fontWeight: FontWeight.w900, letterSpacing: 1.1))),
             IconButton(
-                onPressed: _pickPhoto,
-                tooltip: 'Add a photo',
-                icon: const Icon(Icons.add_a_photo_outlined)),
-            IconButton(
                 onPressed: () => Navigator.pop(context),
                 tooltip: 'Close mission card',
                 icon: const Icon(Icons.close_rounded))
           ]),
           const SizedBox(height: 8),
+          Row(children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: _openCamera,
+                icon: const Icon(Icons.camera_alt_rounded),
+                label: const Text('TAKE PHOTO'),
+              ),
+            ),
+            const SizedBox(width: 9),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => _pickPhoto(ImageSource.gallery),
+                icon: const Icon(Icons.photo_library_rounded),
+                label: const Text('CHOOSE PHOTO'),
+              ),
+            ),
+          ]),
+          if (_photo != null) ...[
+            const SizedBox(height: 9),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Wrap(spacing: 7, children: [
+                for (final filter in MissionProofFilter.values)
+                  ChoiceChip(
+                    label: Text(filter.label),
+                    selected: _filter == filter,
+                    onSelected: (_) => setState(() => _filter = filter),
+                    visualDensity: VisualDensity.compact,
+                  ),
+              ]),
+            ),
+          ],
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+                'Your photo stays on this device until you choose to share.',
+                style: TextStyle(fontSize: 10, color: Color(0xFF6B665E))),
+          ),
+          const SizedBox(height: 10),
           LayoutBuilder(
             builder: (context, constraints) => Screenshot(
               controller: _controller,
@@ -160,9 +218,55 @@ class _ShareCardSheetState extends State<_ShareCardSheet> {
           const SizedBox(height: 20),
           if (_photo != null)
             ClipRRect(
-                borderRadius: BorderRadius.circular(18),
-                child: Image.memory(_photo!,
-                    height: 190, width: double.infinity, fit: BoxFit.cover))
+              borderRadius: BorderRadius.circular(18),
+              child: SizedBox(
+                height: 190,
+                width: double.infinity,
+                child: Stack(fit: StackFit.expand, children: [
+                  ColorFiltered(
+                    colorFilter: ColorFilter.matrix(_filter.matrix),
+                    child: Image.memory(_photo!, fit: BoxFit.cover),
+                  ),
+                  if (_filter == MissionProofFilter.comic)
+                    const CustomPaint(painter: MissionHalftonePainter()),
+                  IgnorePointer(child: MissionProofTint(filter: _filter)),
+                  if (_sticker != MissionProofSticker.none)
+                    Align(
+                      alignment: _stickerAlignment,
+                      child:
+                          MissionProofStickerView(sticker: _sticker, size: 94),
+                    ),
+                  Positioned(
+                    top: 11,
+                    right: 11,
+                    child: Transform.rotate(
+                      angle: .08,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 11, vertical: 7),
+                        decoration: BoxDecoration(
+                          color: YoloColors.yellow,
+                          border: Border.all(color: YoloColors.ink, width: 2),
+                          borderRadius: BorderRadius.circular(9),
+                          boxShadow: const [
+                            BoxShadow(
+                                color: YoloColors.ink, offset: Offset(2, 3)),
+                          ],
+                        ),
+                        child: const Text('I DID IT!',
+                            style: TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.w900)),
+                      ),
+                    ),
+                  ),
+                  const Positioned(
+                    left: 10,
+                    bottom: 9,
+                    child: _ComicBurst(label: 'YOLO!'),
+                  ),
+                ]),
+              ),
+            )
           else
             Container(
                 height: 160,
@@ -172,8 +276,14 @@ class _ShareCardSheetState extends State<_ShareCardSheet> {
                     border: Border.all(color: YoloColors.ink, width: 2),
                     borderRadius: BorderRadius.circular(18)),
                 child: const Center(
-                    child: Icon(Icons.bolt_rounded,
-                        size: 78, color: YoloColors.red))),
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.add_a_photo_rounded,
+                      size: 47, color: YoloColors.red),
+                  SizedBox(height: 6),
+                  Text('ADD YOUR MISSION MOMENT',
+                      style:
+                          TextStyle(fontSize: 10, fontWeight: FontWeight.w900)),
+                ]))),
           const SizedBox(height: 19),
           Text(widget.subtitle ?? 'MISSION COMPLETE!',
               style: const TextStyle(
@@ -216,4 +326,31 @@ class _ShareCardSheetState extends State<_ShareCardSheet> {
             style: const TextStyle(
                 fontSize: 8, fontWeight: FontWeight.w900, letterSpacing: .5))
       ]);
+}
+
+class _ComicBurst extends StatelessWidget {
+  const _ComicBurst({required this.label});
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Transform.rotate(
+        angle: -.08,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+          decoration: BoxDecoration(
+            color: YoloColors.red,
+            border: Border.all(color: Colors.white, width: 2),
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: const [
+              BoxShadow(color: YoloColors.ink, offset: Offset(2, 3)),
+            ],
+          ),
+          child: Text(label,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: .7)),
+        ),
+      );
 }

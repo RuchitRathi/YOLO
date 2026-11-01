@@ -10,6 +10,7 @@ class Mission {
   final int duration, budget, xp;
   final String instructions;
   final String currency;
+  final String? fitReason;
   const Mission(
       {required this.id,
       required this.title,
@@ -22,7 +23,23 @@ class Mission {
       required this.xp,
       required this.environment,
       required this.instructions,
-      this.currency = '₹'});
+      this.currency = '₹',
+      this.fitReason});
+  Mission copyWith({String? fitReason}) => Mission(
+        id: id,
+        title: title,
+        description: description,
+        category: category,
+        moods: moods,
+        duration: duration,
+        budget: budget,
+        difficulty: difficulty,
+        xp: xp,
+        environment: environment,
+        instructions: instructions,
+        currency: currency,
+        fitReason: fitReason ?? this.fitReason,
+      );
   Map<String, dynamic> toJson() =>
       {'id': id, 'title': title, 'status': '', 'date': ''};
 }

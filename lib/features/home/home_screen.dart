@@ -172,6 +172,10 @@ class HomeScreen extends ConsumerWidget {
                         label: 'Squad YOLO',
                         onTap: () => context.push('/squad')),
                     _WorldChip(
+                        icon: Icons.smart_toy_rounded,
+                        label: 'Ask Shinchan',
+                        onTap: () => context.push('/companion')),
+                    _WorldChip(
                         icon: Icons.photo_album_outlined,
                         label: 'Memories',
                         onTap: () => context.push('/memories')),

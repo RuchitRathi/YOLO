@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
@@ -21,6 +22,44 @@ class PersonalizedMissionsService {
       _geminiKey.isEmpty || _geminiKey == 'your-gemini-api-key'
           ? 'missing_key'
           : 'ready';
+
+  List<Mission> localFallback({
+    required String preference,
+    required List<String> recentHistory,
+  }) {
+    final recentTitles = recentHistory
+        .map((entry) => entry.split(':').last.trim().toLowerCase())
+        .where((title) => title.isNotEmpty)
+        .toSet();
+    final wantedCategory = switch (preference) {
+      'Creative' => 'Creative',
+      'Adventurous' => 'Adventure',
+      'Social' => 'Social',
+      'Chill' => 'Entertainment',
+      _ => null,
+    };
+    final fresh = missions
+        .where((mission) => !recentTitles.contains(mission.title.toLowerCase()))
+        .toList();
+    final preferred = wantedCategory == null
+        ? fresh
+        : fresh.where((mission) => mission.category == wantedCategory).toList();
+    final pool = preferred.length >= 3 ? preferred : fresh;
+    pool.sort((a, b) {
+      final duration = a.duration.compareTo(b.duration);
+      return duration != 0 ? duration : a.id.compareTo(b.id);
+    });
+    pool.shuffle(Random.secure());
+    return pool.take(3).map((mission) {
+      final vibe = preference == 'Surprise me'
+          ? 'your current vibe'
+          : '$preference vibe';
+      return mission.copyWith(
+        fitReason:
+            'Picked for $vibe, avoids your recent repeats, and works without live location, weather, or a network connection.',
+      );
+    }).toList(growable: false);
+  }
 
   Future<List<Mission>> generate({
     required String preference,
@@ -65,7 +104,7 @@ Local date and time: ${now.toString()} (${_weekday(now.weekday)}).
 Approximate device location: ${location ?? 'unavailable; keep missions location-neutral'}.
 Current weather: ${weather['description']}, ${weather['temperatureC']}°C near ${weather['city']} ${weather['country']}.
 Recent missions to avoid repeating: $recent.
-Each mission takes 10 minutes and costs at most 5 USD. Make them suitable for a public place or at-home; no trespassing, unsafe traffic, coercion, purchases, or special equipment. Each object must have title, description (one sentence), instructions (one concise sentence), category (Adventure, Creative, Social, Fitness, Learning, or Entertainment), costUsd (number 0 to 5).''';
+Each mission takes 10 minutes and costs at most 5 USD. Make them suitable for a public place or at-home; no trespassing, unsafe traffic, coercion, purchases, or special equipment. Each object must have title, description (one sentence), instructions (one concise sentence), reason (one short truthful sentence explaining how it matches the vibe, available weather/time, and history; never claim unavailable context), category (Adventure, Creative, Social, Fitness, Learning, or Entertainment), costUsd (number 0 to 5).''';
 
     onProgress?.call('Asking Gemini Flash-Lite…');
     final client = http.Client();
@@ -102,6 +141,7 @@ Each mission takes 10 minutes and costs at most 5 USD. Make them suitable for a 
                   'title': {'type': 'STRING'},
                   'description': {'type': 'STRING'},
                   'instructions': {'type': 'STRING'},
+                  'reason': {'type': 'STRING'},
                   'category': {
                     'type': 'STRING',
                     'enum': [
@@ -119,6 +159,7 @@ Each mission takes 10 minutes and costs at most 5 USD. Make them suitable for a 
                   'title',
                   'description',
                   'instructions',
+                  'reason',
                   'category',
                   'costUsd',
                 ],
@@ -325,6 +366,7 @@ Each mission takes 10 minutes and costs at most 5 USD. Make them suitable for a 
     final title = value['title'];
     final description = value['description'];
     final instructions = value['instructions'];
+    final reason = value['reason'];
     final category = value['category'];
     final rawCost = value['costUsd'];
     const categories = {
@@ -357,6 +399,9 @@ Each mission takes 10 minutes and costs at most 5 USD. Make them suitable for a 
       difficulty: 'Easy',
       xp: 15,
       environment: 'Anywhere',
+      fitReason: reason is String && reason.trim().isNotEmpty
+          ? reason.trim()
+          : 'Matches your selected vibe and avoids repeating recent missions.',
     );
   }
 

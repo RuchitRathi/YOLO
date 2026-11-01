@@ -23,7 +23,7 @@ void main() {
     expect(find.text('Explore Missions'), findsOneWidget);
   });
 
-  testWidgets('Squad YOLO works as an offline local demo', (tester) async {
+  testWidgets('Crew Huddle collects real votes on one device', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
     appRouter.go('/squad');
@@ -33,15 +33,20 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('the crew is simulated'), findsOneWidget);
-    final startButton = find.text('Start local demo');
-    await tester.ensureVisible(startButton);
-    await tester.tap(startButton);
+    expect(find.textContaining('SAME-DEVICE GROUP VOTE'), findsOneWidget);
+    final firstVoteButton = find.textContaining('LOCK PLAYER 1');
+    await tester.ensureVisible(firstVoteButton);
+    await tester.tap(firstVoteButton);
     await tester.pumpAndSettle();
 
-    expect(find.text('Mira · demo'), findsOneWidget);
-    expect(find.text('Avi · demo'), findsOneWidget);
-    expect(find.text('SQUAD CONSENSUS'), findsOneWidget);
+    expect(find.text('Player 2 of 2'), findsOneWidget);
+    final revealButton = find.text('LOCK VOTE & REVEAL THE MISSION');
+    await tester.ensureVisible(revealButton);
+    await tester.tap(revealButton);
+    await tester.pumpAndSettle();
+
+    expect(find.text('CREW CONSENSUS'), findsOneWidget);
+    expect(find.textContaining('Adventurer · Player 2'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -65,7 +70,7 @@ void main() {
     );
     await tester.tap(find.text('Make a tiny playlist'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('COMPLETE MISSION'));
+    await tester.tap(find.textContaining('I DID IT! +20 XP'));
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Mission complete! +20 XP'), findsOneWidget);
@@ -98,7 +103,7 @@ void main() {
   });
 
   testWidgets(
-      'personalized panel asks for a Gemini key when it is not configured',
+      'personalized panel shows local fallback missions without a Gemini key',
       (tester) async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
@@ -110,9 +115,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('A little adventure, made for you'), findsOneWidget);
-    await tester.tap(find.text('MAKE 3 WITH GEMINI FLASH-LITE'));
+    await tester.tap(find.text('MAKE 3 PERSONALIZED MISSIONS'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
-    expect(find.textContaining('GEMINI_API_KEY'), findsOneWidget);
+    expect(find.textContaining('Gemini is not configured'), findsOneWidget);
+    expect(find.text('YOUR WILD CARD'), findsNothing);
+    expect(find.text('A little adventure, made for you'), findsOneWidget);
   });
 }

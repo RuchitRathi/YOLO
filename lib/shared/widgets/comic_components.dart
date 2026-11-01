@@ -251,6 +251,30 @@ class MissionCard extends StatelessWidget {
                     style: TextStyle(
                         color: YoloColors.ink.withValues(alpha: .72),
                         height: 1.3)),
+                if (mission.fitReason case final reason?) ...[
+                  const SizedBox(height: 9),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF0B8),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Icons.lightbulb_rounded,
+                              size: 15, color: YoloColors.red),
+                          const SizedBox(width: 6),
+                          Expanded(
+                              child: Text('WHY IT FITS  $reason',
+                                  style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.3))),
+                        ]),
+                  ),
+                ],
                 const SizedBox(height: 11),
                 Wrap(spacing: 7, runSpacing: 6, children: [
                   _MissionTag(

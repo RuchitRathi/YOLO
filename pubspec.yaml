@@ -19,6 +19,8 @@ dependencies:
   screenshot: ^3.0.0
   share_plus: ^13.3.1
   image_picker: ^1.1.2
+  camera: ^0.12.2
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

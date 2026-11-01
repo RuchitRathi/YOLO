@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/chaos/chaos_screen.dart';
+import '../features/companion/companion_screen.dart';
 import '../features/decision/decide_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/memories/memories_screen.dart';
@@ -66,5 +67,8 @@ final appRouter = GoRouter(
     GoRoute(
         path: '/squad',
         pageBuilder: (_, state) => _page(const SquadScreen(), state)),
+    GoRoute(
+        path: '/companion',
+        pageBuilder: (_, state) => _page(const CompanionScreen(), state)),
   ],
 );

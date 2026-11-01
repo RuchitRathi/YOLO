@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../app/providers.dart';
 import '../../data/repository.dart';
+import '../../features/missions/nearby_places_sheet.dart';
 import 'comic_components.dart';
-import 'mission_share_card.dart';
+import 'mission_run_sheet.dart';
 
 Future<void> showMissionDetails(
   BuildContext context,
@@ -27,35 +27,65 @@ Future<void> showMissionDetails(
             Text(mission.description),
             const SizedBox(height: 12),
             Text('How: ${mission.instructions}'),
+            if (mission.fitReason case final reason?) ...[
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(13),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF0B8),
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.black, width: 1.5),
+                ),
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.lightbulb_rounded, size: 19),
+                      const SizedBox(width: 8),
+                      Expanded(
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                            const Text('WHY IT FITS',
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: .8)),
+                            const SizedBox(height: 4),
+                            Text(reason, style: const TextStyle(height: 1.3)),
+                          ])),
+                    ]),
+              ),
+            ],
             const SizedBox(height: 12),
             Text(
                 '${mission.duration} minutes • ${mission.budget == 0 ? 'FREE' : '${mission.currency}${mission.budget}'} • ${mission.difficulty} • ${mission.xp} XP'),
             const SizedBox(height: 16),
-            YoloButton(
-              label: 'ACCEPT MISSION',
-              onPressed: () async {
-                await ref.read(repositoryProvider).record(mission, 'accepted');
-                ref.read(progressRevisionProvider.notifier).state++;
-                if (sheetContext.mounted) Navigator.pop(sheetContext);
-              },
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  if (sheetContext.mounted) Navigator.pop(sheetContext);
+                  if (context.mounted) {
+                    await showNearbyMissionPlaces(context, mission);
+                  }
+                },
+                icon: const Icon(Icons.travel_explore_rounded),
+                label: const Text('FIND A PLACE IN MAPS'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  side: const BorderSide(color: Colors.black, width: 1.5),
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                ),
+              ),
             ),
             const SizedBox(height: 8),
             YoloButton(
-              label: 'COMPLETE MISSION',
+              label: 'START MISSION RUN',
               onPressed: () async {
-                await ref.read(repositoryProvider).record(mission, 'completed');
-                ref.read(progressRevisionProvider.notifier).state++;
-                if (sheetContext.mounted) {
-                  Navigator.pop(sheetContext);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content:
-                            Text('Mission complete! +${mission.xp} XP 🎉')),
-                  );
-                  await Future<void>.delayed(const Duration(milliseconds: 250));
-                  if (context.mounted) {
-                    showMissionShareCard(context, ref, mission);
-                  }
+                if (sheetContext.mounted) Navigator.pop(sheetContext);
+                if (context.mounted) {
+                  await showMissionRun(context, ref, mission);
                 }
               },
             ),

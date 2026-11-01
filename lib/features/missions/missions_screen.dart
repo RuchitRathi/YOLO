@@ -9,6 +9,7 @@ import '../../data/repository.dart';
 import '../../shared/widgets/animated_entrance.dart';
 import '../../shared/widgets/comic_components.dart';
 import '../../shared/widgets/mission_details_sheet.dart';
+import '../../shared/widgets/mission_run_sheet.dart';
 import '../../shared/widgets/yolo_scaffold.dart';
 import 'personalized_missions_service.dart';
 
@@ -371,14 +372,33 @@ class _MissionsScreenState extends ConsumerState<MissionsScreen> {
                   : const Icon(Icons.casino_rounded),
               label: Text(
                   _generating
-                      ? 'DREAMING UP MISSIONS…'
-                      : 'MAKE 3 WITH GEMINI FLASH-LITE',
+                      ? 'PERSONALIZING MISSIONS…'
+                      : 'MAKE 3 PERSONALIZED MISSIONS',
                   style: const TextStyle(fontWeight: FontWeight.w900)),
               style: FilledButton.styleFrom(
                   backgroundColor: YoloColors.ink,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 13)),
             )),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          onPressed: () {
+            final sample = missions
+                .firstWhere((mission) => mission.id == 'm01')
+                .copyWith(
+                    fitReason:
+                        'This sample shows the full mission flow: start a timer, follow a simple step, earn XP, then share your card.');
+            showMissionRun(context, ref, sample,
+                demoDuration: const Duration(seconds: 30));
+          },
+          icon: const Icon(Icons.play_circle_outline_rounded),
+          label: const Text('PLAY A 30-SECOND SAMPLE RUN'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: YoloColors.ink,
+            side: const BorderSide(color: YoloColors.ink, width: 1.5),
+            minimumSize: const Size(double.infinity, 44),
+          ),
+        ),
         if (_aiMessage != null) ...[
           const SizedBox(height: 8),
           Text(_aiMessage!,
@@ -387,7 +407,7 @@ class _MissionsScreenState extends ConsumerState<MissionsScreen> {
         ],
         const SizedBox(height: 7),
         Text(
-            'On tap, your location is used for a local Open-Meteo forecast and rounded before it is shared with Google Gemini alongside your vibe and recent missions. Weather needs no API key; if unavailable, Gemini still creates missions. Weather data by Open-Meteo (CC BY 4.0).',
+            'With Gemini enabled, location is requested only after you tap and used for an Open-Meteo forecast; only an approximate area is shared with Gemini. If Gemini, location, or weather is unavailable, local picks still work using your vibe and recent history. Weather data by Open-Meteo (CC BY 4.0).',
             style: TextStyle(
                 fontSize: 10,
                 height: 1.3,
@@ -406,8 +426,9 @@ class _MissionsScreenState extends ConsumerState<MissionsScreen> {
       final repo = ref.read(repositoryProvider);
       final availability = await _personalizer.availability();
       if (availability == 'missing_key') {
-        throw const MissionGenerationException(
-            'Add a Gemini API key with --dart-define=GEMINI_API_KEY=your_key to enable Gemini Flash.');
+        _showLocalFallback(repo,
+            'Gemini is not configured. Showing instant local picks—no location or network needed.');
+        return;
       }
       final recent = repo.history
           .take(8)
@@ -434,15 +455,30 @@ class _MissionsScreenState extends ConsumerState<MissionsScreen> {
         _aiMessage = 'Fresh ideas, made for you ✨';
       });
     } on MissionGenerationException catch (error) {
-      if (mounted) setState(() => _aiMessage = error.message);
+      if (mounted) {
+        _showLocalFallback(ref.read(repositoryProvider),
+            'Gemini unavailable (${error.message}) Showing instant local picks.');
+      }
     } catch (_) {
       if (mounted) {
-        setState(() => _aiMessage =
-            'Could not make missions right now. Check the setup and try again.');
+        _showLocalFallback(ref.read(repositoryProvider),
+            'Could not reach Gemini. Showing instant local picks instead.');
       }
     } finally {
       if (mounted) setState(() => _generating = false);
     }
+  }
+
+  void _showLocalFallback(YoloRepository repo, String message) {
+    final recent = repo.history
+        .take(8)
+        .map((entry) => '${entry.status}: ${entry.title}')
+        .toList();
+    setState(() {
+      _aiMissions = _personalizer.localFallback(
+          preference: _preference, recentHistory: recent);
+      _aiMessage = message;
+    });
   }
 }
 
