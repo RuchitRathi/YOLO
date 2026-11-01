@@ -175,128 +175,245 @@ class _AnimatedActionTileState extends State<_AnimatedActionTile> {
       );
 }
 
-class YoloButton extends StatelessWidget {
+class YoloButton extends StatefulWidget {
   final String label;
   final VoidCallback? onPressed;
   const YoloButton({super.key, required this.label, required this.onPressed});
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-        width: double.infinity,
-        child: FilledButton(
-          onPressed: onPressed,
-          style: FilledButton.styleFrom(
-            backgroundColor: YoloColors.red,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 17),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: const BorderSide(color: YoloColors.ink, width: 2),
-            ),
-          ),
-          child: Text(label,
-              style: const TextStyle(
-                  fontWeight: FontWeight.w900, letterSpacing: 1)),
-        ),
-      );
+  State<YoloButton> createState() => _YoloButtonState();
 }
 
-class MissionCard extends StatelessWidget {
+class _YoloButtonState extends State<YoloButton> {
+  bool _pressed = false;
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedScale(
+        scale: reduceMotion ? 1 : (_pressed ? .965 : (_hovered ? 1.015 : 1)),
+        duration:
+            reduceMotion ? Duration.zero : const Duration(milliseconds: 150),
+        curve: Curves.easeOutBack,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: widget.onPressed,
+            onTapDown: widget.onPressed == null
+                ? null
+                : (_) => setState(() => _pressed = true),
+            onTapCancel: () => setState(() => _pressed = false),
+            onTapUp: (_) => setState(() => _pressed = false),
+            borderRadius: BorderRadius.circular(18),
+            child: AnimatedContainer(
+              duration: reduceMotion
+                  ? Duration.zero
+                  : const Duration(milliseconds: 170),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: widget.onPressed == null
+                      ? [const Color(0xFFB5A6A2), const Color(0xFF9E928E)]
+                      : [const Color(0xFFFF5549), YoloColors.red],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: YoloColors.ink, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0x33202020),
+                    offset: Offset(0, _pressed ? 1 : 5),
+                    blurRadius: _hovered ? 8 : 0,
+                  ),
+                ],
+              ),
+              child:
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Flexible(
+                  child: Text(widget.label,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1)),
+                ),
+                const SizedBox(width: 9),
+                AnimatedRotation(
+                  turns: !reduceMotion && _hovered ? .08 : 0,
+                  duration: reduceMotion
+                      ? Duration.zero
+                      : const Duration(milliseconds: 260),
+                  child: const Icon(Icons.bolt_rounded,
+                      size: 20, color: YoloColors.yellow),
+                ),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MissionCard extends StatefulWidget {
   final Mission mission;
   final VoidCallback onTap;
   const MissionCard({super.key, required this.mission, required this.onTap});
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(18),
-          child: ComicCard(
-            color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                        color: _missionColor(mission.category)
-                            .withValues(alpha: .24),
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Icon(_missionIcon(mission.category), size: 20),
-                  ),
-                  const SizedBox(width: 9),
-                  Expanded(
-                      child: Text(mission.category.toUpperCase(),
-                          style: const TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1))),
-                  _MissionTag(
-                      label: mission.difficulty.toUpperCase(),
-                      color: YoloColors.background),
-                  const SizedBox(width: 5),
-                  const Icon(Icons.arrow_outward_rounded, size: 17),
-                ]),
-                const SizedBox(height: 11),
-                Text(mission.title,
-                    style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -.25)),
-                const SizedBox(height: 4),
-                Text(mission.description,
-                    style: TextStyle(
-                        color: YoloColors.ink.withValues(alpha: .72),
-                        height: 1.3)),
-                if (mission.fitReason case final reason?) ...[
-                  const SizedBox(height: 9),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFF0B8),
-                      borderRadius: BorderRadius.circular(12),
+  State<MissionCard> createState() => _MissionCardState();
+}
+
+class _MissionCardState extends State<MissionCard> {
+  bool _pressed = false;
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final mission = widget.mission;
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: AnimatedScale(
+          scale: reduceMotion ? 1 : (_pressed ? .985 : (_hovered ? 1.008 : 1)),
+          duration:
+              reduceMotion ? Duration.zero : const Duration(milliseconds: 170),
+          curve: Curves.easeOutBack,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: widget.onTap,
+              onTapDown: (_) => setState(() => _pressed = true),
+              onTapCancel: () => setState(() => _pressed = false),
+              onTapUp: (_) => setState(() => _pressed = false),
+              borderRadius: BorderRadius.circular(20),
+              child: AnimatedContainer(
+                duration: reduceMotion
+                    ? Duration.zero
+                    : const Duration(milliseconds: 200),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0x29202020),
+                      offset: Offset(3, _hovered ? 8 : 5),
+                      blurRadius: _hovered ? 7 : 0,
                     ),
-                    child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(Icons.lightbulb_rounded,
-                              size: 15, color: YoloColors.red),
-                          const SizedBox(width: 6),
-                          Expanded(
-                              child: Text('WHY IT FITS  $reason',
-                                  style: const TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.3))),
-                        ]),
+                  ],
+                ),
+                child: ComicCard(
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [
+                        AnimatedRotation(
+                          turns: !reduceMotion && _hovered ? .08 : 0,
+                          duration: reduceMotion
+                              ? Duration.zero
+                              : const Duration(milliseconds: 280),
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                                color: _missionColor(mission.category)
+                                    .withValues(alpha: .24),
+                                borderRadius: BorderRadius.circular(12)),
+                            child:
+                                Icon(_missionIcon(mission.category), size: 20),
+                          ),
+                        ),
+                        const SizedBox(width: 9),
+                        Expanded(
+                            child: Text(mission.category.toUpperCase(),
+                                style: const TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 1))),
+                        _MissionTag(
+                            label: mission.difficulty.toUpperCase(),
+                            color: YoloColors.background),
+                        const SizedBox(width: 5),
+                        AnimatedRotation(
+                          turns: !reduceMotion && _hovered ? .12 : 0,
+                          duration: reduceMotion
+                              ? Duration.zero
+                              : const Duration(milliseconds: 220),
+                          child:
+                              const Icon(Icons.arrow_outward_rounded, size: 17),
+                        ),
+                      ]),
+                      const SizedBox(height: 11),
+                      Text(mission.title,
+                          style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -.25)),
+                      const SizedBox(height: 4),
+                      Text(mission.description,
+                          style: TextStyle(
+                              color: YoloColors.ink.withValues(alpha: .72),
+                              height: 1.3)),
+                      if (mission.fitReason case final reason?) ...[
+                        const SizedBox(height: 9),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF0B8),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(Icons.lightbulb_rounded,
+                                    size: 15, color: YoloColors.red),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                    child: Text('WHY IT FITS  $reason',
+                                        style: const TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w700,
+                                            height: 1.3))),
+                              ]),
+                        ),
+                      ],
+                      const SizedBox(height: 11),
+                      Wrap(spacing: 7, runSpacing: 6, children: [
+                        _MissionTag(
+                            label: '${mission.duration} MIN',
+                            icon: Icons.schedule_rounded,
+                            color: const Color(0xFFF0F0ED)),
+                        _MissionTag(
+                            label: mission.budget == 0
+                                ? 'FREE'
+                                : '${mission.currency}${mission.budget}',
+                            icon: Icons.account_balance_wallet_outlined,
+                            color: const Color(0xFFF0F0ED)),
+                        _MissionTag(
+                            label: '+${mission.xp} XP',
+                            icon: Icons.bolt_rounded,
+                            color: YoloColors.yellow),
+                      ]),
+                    ],
                   ),
-                ],
-                const SizedBox(height: 11),
-                Wrap(spacing: 7, runSpacing: 6, children: [
-                  _MissionTag(
-                      label: '${mission.duration} MIN',
-                      icon: Icons.schedule_rounded,
-                      color: const Color(0xFFF0F0ED)),
-                  _MissionTag(
-                      label: mission.budget == 0
-                          ? 'FREE'
-                          : '${mission.currency}${mission.budget}',
-                      icon: Icons.account_balance_wallet_outlined,
-                      color: const Color(0xFFF0F0ED)),
-                  _MissionTag(
-                      label: '+${mission.xp} XP',
-                      icon: Icons.bolt_rounded,
-                      color: YoloColors.yellow),
-                ]),
-              ],
+                ),
+              ),
             ),
           ),
         ),
-      );
+      ),
+    );
+  }
 }
 
 class _MissionTag extends StatelessWidget {
