@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../app/theme.dart';
-
 enum MissionProofFilter {
   comic('COMIC POP', [
     1.38,
@@ -104,9 +102,9 @@ class MissionProofTint extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  YoloColors.yellow.withValues(alpha: .30),
+                  const Color(0xFFFFD640).withValues(alpha: .30),
                   Colors.transparent,
-                  YoloColors.red.withValues(alpha: .22),
+                  const Color(0xFFE53935).withValues(alpha: .22),
                 ],
               ),
             ),
@@ -117,8 +115,8 @@ class MissionProofTint extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomRight,
                 colors: [
-                  YoloColors.yellow.withValues(alpha: .35),
-                  YoloColors.red.withValues(alpha: .20),
+                  const Color(0xFFFFC857).withValues(alpha: .35),
+                  const Color(0xFFFF6B8A).withValues(alpha: .20),
                 ],
               ),
             ),
@@ -178,7 +176,7 @@ class MissionProofStickerView extends StatelessWidget {
               padding: EdgeInsets.symmetric(
                   horizontal: size * .14, vertical: size * .08),
               decoration: BoxDecoration(
-                color: YoloColors.yellow,
+                color: const Color(0xFFFFD640),
                 border: Border.all(color: Colors.black, width: 3),
                 borderRadius: BorderRadius.circular(size * .14),
                 boxShadow: const [
@@ -190,7 +188,7 @@ class MissionProofStickerView extends StatelessWidget {
               ),
               child: Text('POW!',
                   style: TextStyle(
-                      color: YoloColors.red,
+                      color: const Color(0xFFE53935),
                       fontSize: size * .28,
                       fontWeight: FontWeight.w900,
                       letterSpacing: .5)),

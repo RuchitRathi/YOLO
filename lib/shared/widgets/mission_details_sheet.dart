@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../app/theme.dart';
 import '../../data/repository.dart';
 import '../../features/missions/nearby_places_sheet.dart';
 import 'comic_components.dart';
@@ -34,7 +33,7 @@ Future<void> showMissionDetails(
                 width: double.infinity,
                 padding: const EdgeInsets.all(13),
                 decoration: BoxDecoration(
-                  color: YoloColors.mint.withValues(alpha: .58),
+                  color: const Color(0xFFFFF0B8),
                   borderRadius: BorderRadius.circular(15),
                   border: Border.all(color: Colors.black, width: 1.5),
                 ),

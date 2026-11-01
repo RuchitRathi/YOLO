@@ -209,7 +209,7 @@ class _SquadScreenState extends ConsumerState<SquadScreen> {
   Widget _privacyBanner() => Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: YoloColors.mint.withValues(alpha: .55),
+          color: const Color(0xFFFFF0B8),
           borderRadius: BorderRadius.circular(17),
           border: Border.all(color: YoloColors.ink, width: 1.5),
         ),
@@ -539,9 +539,9 @@ class _CrewWheelPainter extends CustomPainter {
     YoloColors.red,
     YoloColors.yellow,
     YoloColors.blue,
-    YoloColors.sage,
-    YoloColors.mauve,
-    YoloColors.yellow,
+    Color(0xFF8DD6B5),
+    Color(0xFFD5B4F2),
+    Color(0xFFFFA94D),
   ];
   static const labels = [
     'ADVENTURE',

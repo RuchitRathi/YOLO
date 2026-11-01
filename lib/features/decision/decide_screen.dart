@@ -310,9 +310,9 @@ class _WheelPainter extends CustomPainter {
     YoloColors.yellow,
     YoloColors.red,
     YoloColors.blue,
-    YoloColors.sage,
-    YoloColors.yellow,
-    YoloColors.mauve
+    Color(0xFF8DD6B5),
+    Color(0xFFFFA94D),
+    Color(0xFFD5B4F2)
   ];
 
   @override

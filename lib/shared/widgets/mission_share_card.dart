@@ -18,7 +18,7 @@ Future<void> showMissionShareCard(
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: YoloColors.background,
+      backgroundColor: const Color(0xFFFFF9EC),
       builder: (context) => _ShareCardSheet(
           mission: mission,
           username: ref.read(repositoryProvider).username,
@@ -191,7 +191,7 @@ class _ShareCardSheetState extends State<_ShareCardSheet> {
         constraints: const BoxConstraints(minHeight: 510),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-            color: YoloColors.yellow,
+            color: const Color(0xFFFFD640),
             border: Border.all(color: YoloColors.ink, width: 3),
             borderRadius: BorderRadius.circular(28),
             boxShadow: const [
@@ -272,7 +272,7 @@ class _ShareCardSheetState extends State<_ShareCardSheet> {
                 height: 160,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                    color: YoloColors.background,
+                    color: const Color(0xFFFFF9EC),
                     border: Border.all(color: YoloColors.ink, width: 2),
                     borderRadius: BorderRadius.circular(18)),
                 child: const Center(
