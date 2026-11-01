@@ -273,8 +273,8 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
             color: _connectionError == null
-                ? const Color(0xFFE5F5DF)
-                : const Color(0xFFFFE8D8),
+                ? YoloColors.mint
+                : YoloColors.yellow.withValues(alpha: .58),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: YoloColors.ink, width: 1.2),
           ),

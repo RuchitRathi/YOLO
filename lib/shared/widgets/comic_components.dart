@@ -219,8 +219,8 @@ class _YoloButtonState extends State<YoloButton> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: widget.onPressed == null
-                      ? [const Color(0xFFB5A6A2), const Color(0xFF9E928E)]
-                      : [const Color(0xFFFF5549), YoloColors.red],
+                      ? [const Color(0xFFA2B7AE), const Color(0xFF839C91)]
+                      : [const Color(0xFFB86E72), YoloColors.red],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -375,7 +375,7 @@ class _MissionCardState extends State<MissionCard> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFFF0B8),
+                              color: YoloColors.mint.withValues(alpha: .55),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
@@ -398,13 +398,13 @@ class _MissionCardState extends State<MissionCard> {
                           _MissionTag(
                               label: '${mission.duration} MIN',
                               icon: Icons.schedule_rounded,
-                              color: const Color(0xFFF0F0ED)),
+                              color: YoloColors.background),
                           _MissionTag(
                               label: mission.budget == 0
                                   ? 'FREE'
                                   : '${mission.currency}${mission.budget}',
                               icon: Icons.account_balance_wallet_outlined,
-                              color: const Color(0xFFF0F0ED)),
+                              color: YoloColors.background),
                           _MissionTag(
                               label: '+${mission.xp} XP',
                               icon: Icons.bolt_rounded,
@@ -457,8 +457,8 @@ IconData _missionIcon(String category) => switch (category) {
 Color _missionColor(String category) => switch (category) {
       'Adventure' => YoloColors.blue,
       'Creative' => YoloColors.red,
-      'Social' => const Color(0xFF8DD6B5),
+      'Social' => YoloColors.sage,
       'Fitness' => YoloColors.yellow,
-      'Learning' => const Color(0xFFD5B4F2),
-      _ => const Color(0xFFFFA94D),
+      'Learning' => YoloColors.mauve,
+      _ => YoloColors.yellow,
     };

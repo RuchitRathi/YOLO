@@ -323,7 +323,7 @@ class _MissionsScreenState extends ConsumerState<MissionsScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-            colors: [Color(0xFFFFE879), Color(0xFFFFC8A7)],
+            colors: [YoloColors.yellow, YoloColors.mint],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight),
         borderRadius: BorderRadius.circular(22),

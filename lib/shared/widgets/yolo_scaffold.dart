@@ -24,6 +24,17 @@ class YoloScaffold extends StatelessWidget {
         body: Stack(
           fit: StackFit.expand,
           children: [
+            const Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [YoloColors.background, Color(0xFFEAF6F0)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+              ),
+            ),
             const _PlayfulBackdrop(),
             SafeArea(
               child: Center(
